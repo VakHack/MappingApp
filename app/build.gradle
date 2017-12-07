@@ -27,5 +27,6 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
 
     compile 'commons-io:commons-io:2.4'
+    compile 'com.google.maps.android:android-maps-utils:0.5+'
 
 }
