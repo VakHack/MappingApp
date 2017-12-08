@@ -41,6 +41,8 @@ public class BoundariesChecker {
         KmlPolygon polygon = (KmlPolygon)placemark.getGeometry();
 
         boundaries = polygon.getOuterBoundaryCoordinates();
+
+        Log.e("maplog", "" + boundaries);
     }
 
     private void findMidCoordinate(){
@@ -59,9 +61,18 @@ public class BoundariesChecker {
         midCoordinate = new LatLng(lat/ n, lng/ n);
     }
 
-    public boolean isWithin(LatLng latLng) {
+    private boolean isIntersect(LatLng startPoint, LatLng endPoint){
 
-        Log.e("maplog", "" + boundaries);
+        for(LatLng latLng : boundaries){
+
+
+        }
+        Line2D line1 = new Line2D.Float(100, 100, 200, 200);
+        Line2D line2 = new Line2D.Float(150, 150, 150, 200);
+        boolean result = line2.intersectsLine(line1);
+    }
+
+    public boolean isWithin(LatLng latLng) {
 
         return true;
     }
