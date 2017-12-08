@@ -19,9 +19,11 @@ public class BoundariesChecker {
     private KmlLayer kmlLayer;
     private List<LatLng> boundaries;
     private LatLng midCoordinate;
+    private int intersectionRange;
 
-    BoundariesChecker(KmlLayer kmlLayer){
+    BoundariesChecker(KmlLayer kmlLayer, int intersectionRange){
         this.kmlLayer = kmlLayer;
+        this.intersectionRange = intersectionRange;
 
         initBoundaries();
         findMidCoordinate();
@@ -61,20 +63,31 @@ public class BoundariesChecker {
         midCoordinate = new LatLng(lat/ n, lng/ n);
     }
 
-    private boolean isIntersect(LatLng startPoint, LatLng endPoint){
+    private boolean isIntersect(LatLng startPoint, LatLng endPoint, boolean forLatRange){
 
-        for(LatLng latLng : boundaries){
+        LatLng[] firstLine = {startPoint, endPoint};
 
+        for(int i = 0; i < boundaries.size() - 1; ++i){
 
+            LatLng[] secLine = {boundaries.get(i), boundaries.get(i + 1)};
+
+            if(Intersector.isIntresectWithinRange(firstLine, secLine, forLatRange)) return true;
         }
-        Line2D line1 = new Line2D.Float(100, 100, 200, 200);
-        Line2D line2 = new Line2D.Float(150, 150, 150, 200);
-        boolean result = line2.intersectsLine(line1);
+
+        return false;
     }
 
     public boolean isWithin(LatLng latLng) {
 
-        return true;
+        //checking if line from coordinate towards north, east, south and west intersects with polygon
+        LatLng latLow = new LatLng(latLng.latitude - intersectionRange, latLng.longitude);
+        LatLng latHi = new LatLng(latLng.latitude + intersectionRange, latLng.longitude);
+
+        LatLng lngLow = new LatLng(latLng.latitude, latLng.longitude - intersectionRange);
+        LatLng lngHi = new LatLng(latLng.latitude, latLng.longitude + intersectionRange);
+
+        return isIntersect(latLng, latLow, true) && isIntersect(latLng, latHi, true) &&
+                isIntersect(latLng, lngLow, false) &&isIntersect(latLng, lngHi, false);
     }
 
     public LatLng getMidCoordinate() {
