@@ -1,0 +1,57 @@
+package async.example.com.mappingapp;
+
+import android.os.AsyncTask;
+import android.util.Log;
+
+import com.google.android.gms.maps.model.LatLng;
+
+import java.util.List;
+
+/**
+ * Created by Administrator on 08/12/2017.
+ */
+
+public class RelationCheckExecutor extends AsyncTask<LatLng, Void, Boolean> {
+
+    private List<LatLng> boundaries;
+    private int intersectionRange;
+
+    public RelationCheckExecutor(List<LatLng> boundaries, int intersectionRange) {
+        this.boundaries = boundaries;
+        this.intersectionRange = intersectionRange;
+    }
+
+    @Override
+    protected Boolean doInBackground(LatLng... latLngs) {
+        return isWithin(latLngs[0]);
+    }
+
+    private boolean isIntersect(LatLng startPoint, LatLng endPoint, boolean forLatRange){
+
+        LatLng[] firstLine = {startPoint, endPoint};
+
+        for(int i = 0; i < boundaries.size() - 1; ++i){
+
+            LatLng[] secLine = {boundaries.get(i), boundaries.get(i + 1)};
+
+            if(Intersector.isIntersectWithinRange(firstLine, secLine, forLatRange)) return true;
+        }
+
+        return false;
+    }
+
+    private boolean isWithin(LatLng latLng) {
+
+        //checking if line leaving latLng towards north, east, south and west intersects with polygon
+        LatLng latLow = new LatLng(latLng.latitude - intersectionRange, latLng.longitude);
+        LatLng latHi = new LatLng(latLng.latitude + intersectionRange, latLng.longitude);
+
+        LatLng lngLow = new LatLng(latLng.latitude, latLng.longitude - intersectionRange);
+        LatLng lngHi = new LatLng(latLng.latitude, latLng.longitude + intersectionRange);
+
+        Log.i("maplog", "" + latLow + " " + latHi + " " + lngLow + " " + latHi);
+
+        return isIntersect(latLng, latLow, true) && isIntersect(latLng, latHi, true) &&
+                isIntersect(latLng, lngLow, false) && isIntersect(latLng, lngHi, false);
+    }
+}

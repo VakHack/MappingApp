@@ -2,7 +2,6 @@ package async.example.com.mappingapp;
 
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
-import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -16,13 +15,16 @@ import com.google.maps.android.data.kml.KmlLayer;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
+import java.util.concurrent.ExecutionException;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap map;
     private KmlLayer allowedArea;
     private Marker customMarker = null;
-    private BoundariesChecker bc;
+    private PolygonRelationChecker rc;
+
+    final private int INTERSECTION_BOUNDS = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,26 +52,33 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             e.printStackTrace();
         }
 
-        bc = new BoundariesChecker(allowedArea);
-
         // centering camera on polygon
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(bc.getMidCoordinate(), 12));
-        map.addMarker(new MarkerOptions().position(bc.getMidCoordinate()));
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(rc.getMidCoordinate(), 12));
+
+        rc = new PolygonRelationChecker(allowedArea, INTERSECTION_BOUNDS);
 
         map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
 
             @Override
             public void onMapClick(LatLng latLng) {
 
-                if(customMarker != null){
+                if (customMarker != null) {
                     customMarker.remove();
                 }
 
                 customMarker = map.addMarker(new MarkerOptions().position(latLng));
 
-                if(bc.isWithin(latLng)){
+                try {
 
-                    Toast.makeText(getApplicationContext(), "Marker is within polygon boundaries", Toast.LENGTH_SHORT).show();
+                    if (rc.isWithin(latLng)) {
+
+                        customMarker.setSnippet("Marker is within\npolygon boundaries");
+                        customMarker.showInfoWindow();
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
                 }
             }
         });

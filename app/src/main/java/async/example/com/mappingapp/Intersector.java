@@ -53,7 +53,7 @@ public class Intersector {
         return secLowLat >= firstLowLat && secHighLat <= firstHighLat;
     }
 
-    public static boolean isIntresectWithinRange(LatLng[] first, LatLng[] sec, boolean forLatRange){
+    public static boolean isIntersectWithinRange(LatLng[] first, LatLng[] sec, boolean forLatRange){
 
         if(forLatRange) return doLinesIntersect(first, sec) && isWithinRangeOfLat(first, sec);
         else return doLinesIntersect(first, sec) && isWithinRangeOfLng(first, sec);
