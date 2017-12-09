@@ -1,70 +1,61 @@
 package async.example.com.mappingapp;
 
+import android.os.AsyncTask;
+import android.util.Log;
+
 import com.google.android.gms.maps.model.LatLng;
-import com.google.maps.android.data.kml.KmlContainer;
-import com.google.maps.android.data.kml.KmlLayer;
-import com.google.maps.android.data.kml.KmlPlacemark;
-import com.google.maps.android.data.kml.KmlPolygon;
 
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 /**
- * Created by Administrator on 07/12/2017.
+ * Created by Administrator on 08/12/2017.
  */
 
-public class PolygonRelationChecker {
-
-    private KmlLayer kmlLayer;
-    private LatLng midCoordinate;
+public class PolygonRelationChecker extends AsyncTask<LatLng, Void, Boolean> {
 
     private List<LatLng> boundaries;
     private int intersectionRange;
 
-    PolygonRelationChecker(KmlLayer kmlLayer, int intersectionRange){
-        this.kmlLayer = kmlLayer;
+    public PolygonRelationChecker(List<LatLng> boundaries, int intersectionRange) {
+        this.boundaries = boundaries;
         this.intersectionRange = intersectionRange;
-
-        boundaries = initBoundaries();
-        midCoordinate = findMidCoordinate(boundaries);
     }
 
-    private List<LatLng> initBoundaries(){
-
-        KmlContainer kmlContainer = kmlLayer.getContainers().iterator().next();
-
-        if (kmlContainer == null) return null;
-
-        KmlPlacemark placemark = kmlContainer.getPlacemarks().iterator().next();
-        KmlPolygon polygon = (KmlPolygon)placemark.getGeometry();
-
-        return polygon.getOuterBoundaryCoordinates();
+    @Override
+    protected Boolean doInBackground(LatLng... latLngs) {
+        return isWithin(latLngs[0]);
     }
 
-    private LatLng findMidCoordinate(List<LatLng> boundaries){
+    private boolean isIntersect(LatLng startPoint, LatLng endPoint){
 
-        int n = boundaries.size();
-        float lat = 0;
-        float lng = 0;
+        LatLng[] firstLine = {startPoint, endPoint};
 
-        for(LatLng latLng : boundaries){
+        for(int i = 0; i < boundaries.size() - 1; ++i){
 
-            lat += latLng.latitude;
-            lng += latLng.longitude;
+            LatLng[] secLine = {boundaries.get(i), boundaries.get(i + 1)};
+
+            if(IntersectionChecker.isIntersectWithinRange(firstLine, secLine)) return true;
         }
 
-        //setting the mid coordinate to be the average point on the polygon
-        return new LatLng(lat/ n, lng/ n);
+        return false;
     }
 
-    public LatLng getMidCoordinate() {
-        return midCoordinate;
-    }
+    private boolean isWithin(LatLng latLng) {
 
-    public boolean isWithin(LatLng latLng) throws ExecutionException, InterruptedException {
+        //checking if the line leaving latLng towards north, east, south and west intersects with polygon
+        LatLng latLow = new LatLng(latLng.latitude - intersectionRange, latLng.longitude);
+        LatLng latHi = new LatLng(latLng.latitude + intersectionRange, latLng.longitude);
 
-        RelationCheckExecutor executor = new RelationCheckExecutor(boundaries, intersectionRange);
+        LatLng lngLow = new LatLng(latLng.latitude, latLng.longitude - intersectionRange);
+        LatLng lngHi = new LatLng(latLng.latitude, latLng.longitude + intersectionRange);
 
-        return executor.execute(latLng).get();
+        boolean allSidesIntersection = isIntersect(latLng, latLow)
+                && isIntersect(latLng, latHi)
+                && isIntersect(latLng, lngLow)
+                && isIntersect(latLng, lngHi);
+
+        Log.i("maplog", String.valueOf(allSidesIntersection));
+
+        return allSidesIntersection;
     }
 }

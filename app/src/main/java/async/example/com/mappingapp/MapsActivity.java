@@ -2,6 +2,7 @@ package async.example.com.mappingapp;
 
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -10,6 +11,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.maps.android.data.kml.KmlLayer;
 
 import org.xmlpull.v1.XmlPullParserException;
@@ -22,7 +24,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleMap map;
     private KmlLayer allowedArea;
     private Marker customMarker = null;
-    private PolygonRelationChecker rc;
+    private PolygonsHandler ph;
 
     final private int INTERSECTION_BOUNDS = 1;
 
@@ -41,24 +43,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         map = googleMap;
 
-        try {
+        ph = new PolygonsHandler(map, getApplicationContext(), R.raw.allowed_area, INTERSECTION_BOUNDS);
 
-            allowedArea = new KmlLayer(map, R.raw.allowed_area, getApplicationContext());
-            allowedArea.addLayerToMap();
-
-        } catch (XmlPullParserException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        //adding given polygon to map
+        PolygonOptions polygon = new PolygonOptions();
+        polygon.addAll(ph.getBoundaries());
+        map.addPolygon(polygon);
 
         // centering camera on polygon
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(rc.getMidCoordinate(), 12));
-
-        rc = new PolygonRelationChecker(allowedArea, INTERSECTION_BOUNDS);
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(ph.getMidCoordinate(), 12));
 
         map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
-
             @Override
             public void onMapClick(LatLng latLng) {
 
@@ -70,11 +65,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 try {
 
-                    if (rc.isWithin(latLng)) {
+                    if (ph.isWithin(latLng)) {
 
-                        customMarker.setSnippet("Marker is within\npolygon boundaries");
-                        customMarker.showInfoWindow();
+                        Toast.makeText(getApplicationContext(), "Marker is within polygon boundaries", Toast.LENGTH_SHORT).show();
                     }
+
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 } catch (ExecutionException e) {
