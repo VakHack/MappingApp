@@ -54,8 +54,6 @@ public class WithinPolygonChecker extends AsyncTask<LatLng, Void, Boolean> {
                 && isIntersect(latLng, lngLow)
                 && isIntersect(latLng, lngHi);
 
-        Log.i("maplog", String.valueOf(allSidesIntersection));
-
         return allSidesIntersection;
     }
 }

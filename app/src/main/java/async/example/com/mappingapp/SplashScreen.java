@@ -19,6 +19,9 @@ public class SplashScreen extends AppCompatActivity {
         TextView tv = findViewById(R.id.title);
         tv.setTypeface(Typeface.createFromAsset(getAssets(), "Anabelle Script.ttf"));
 
+        TextView stv = findViewById(R.id.sub);
+        stv.setTypeface(Typeface.createFromAsset(getAssets(), "Stay_Writer.ttf"));
+
         new Handler().postDelayed(new Runnable(){
             @Override
             public void run() {

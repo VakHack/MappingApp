@@ -22,5 +22,16 @@
         android:textColor="@android:color/white"
         android:textSize="85sp"/>
 
+    <TextView
+        android:id="@+id/sub"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/title"
+        android:layout_centerHorizontal="true"
+        android:paddingTop="10dp"
+        android:text="by Roee Vakrat"
+        android:textColor="#f39c12"
+        android:textSize="25sp"/>
+
 
 </RelativeLayout>
