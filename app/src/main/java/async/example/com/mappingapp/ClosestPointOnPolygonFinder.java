@@ -1,6 +1,7 @@
 package async.example.com.mappingapp;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -66,7 +67,7 @@ public class ClosestPointOnPolygonFinder extends AsyncTask<Void, Void, Double> {
 
     private void findClosetPointBetweenClosestCouple(){
 
-        final int PROXIMATION_CYCLES = 10;
+        final double PROXIMATION_CYCLES = DistanceCalculator.coordinatesDistance(closest, secClosest) / 100;
 
         for(int i = 0; i < PROXIMATION_CYCLES; ++i){
 
