@@ -19,7 +19,7 @@ import java.util.concurrent.ExecutionException;
  * Created by Administrator on 07/12/2017.
  */
 
-public class PolygonsHandler {
+public class PolygonHandler {
 
     private KmlLayer areaLayer;
     private LatLng midCoordinate;
@@ -27,7 +27,7 @@ public class PolygonsHandler {
     private List<LatLng> boundaries;
     private int intersectionRange;
 
-    PolygonsHandler(GoogleMap map, Context context, int areaRawPath, int intersectionRange){
+    PolygonHandler(GoogleMap map, Context context, int areaRawPath, int intersectionRange){
         this.intersectionRange = intersectionRange;
 
         try {

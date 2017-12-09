@@ -47,6 +47,6 @@ public class DistanceCalculator {
         double mx = (first.longitude + sec.longitude)/2;
         double my = (first.latitude + sec.latitude)/2;
 
-        return new LatLng(mx,my);
+        return new LatLng(my, mx);
     }
 }

@@ -13,11 +13,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolygonOptions;
-import com.google.maps.android.data.kml.KmlLayer;
 
-import org.xmlpull.v1.XmlPullParserException;
-
-import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
@@ -28,7 +24,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private GoogleMap map;
     private Marker customMarker = null;
-    private PolygonsHandler[] ph;
+    private PolygonHandler[] ph;
     private PolygonOptions[] polygon;
     private int currentActivePoly = BAD_POLY_INDEX;
 
@@ -45,7 +41,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private void addPolygonToMap(int rawId, int num){
 
-        ph[num] = new PolygonsHandler(map, getApplicationContext(), rawId, INTERSECTION_BOUNDS);
+        ph[num] = new PolygonHandler(map, getApplicationContext(), rawId, INTERSECTION_BOUNDS);
 
         //adding given polygon to map
         polygon[num] = new PolygonOptions();
@@ -59,7 +55,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         //initialize the two polygons arrays
         polygon = new PolygonOptions[2];
-        ph = new PolygonsHandler[2];
+        ph = new PolygonHandler[2];
 
         addPolygonToMap(R.raw.allowed_area, GOOD_POLY_INDEX);
         addPolygonToMap(R.raw.bad_sample, BAD_POLY_INDEX);
@@ -104,8 +100,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 if(currentActivePoly == BAD_POLY_INDEX){
                     currentActivePoly = GOOD_POLY_INDEX;
 
-                    polygon[BAD_POLY_INDEX].visible(false);
-                    polygon[GOOD_POLY_INDEX].visible(true);
                     map.moveCamera(CameraUpdateFactory.newLatLngZoom(ph[GOOD_POLY_INDEX].getMidCoordinate(), 14));
                 }
             }
@@ -121,9 +115,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 if(currentActivePoly == GOOD_POLY_INDEX){
                     currentActivePoly = BAD_POLY_INDEX;
 
-                    polygon[BAD_POLY_INDEX].visible(true);
-                    polygon[GOOD_POLY_INDEX].visible(false);
-                    map.moveCamera(CameraUpdateFactory.newLatLngZoom(ph[BAD_POLY_INDEX].getMidCoordinate(), 7));
+                    map.moveCamera(CameraUpdateFactory.newLatLngZoom(ph[BAD_POLY_INDEX].getMidCoordinate(), 6));
                 }
             }
         });

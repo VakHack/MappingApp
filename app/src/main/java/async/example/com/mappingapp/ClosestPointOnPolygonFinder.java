@@ -19,8 +19,6 @@ public class ClosestPointOnPolygonFinder extends AsyncTask<Void, Void, Double> {
     private LatLng closest = null;
     private LatLng secClosest = null;
 
-    private double closestDistance;
-
     public ClosestPointOnPolygonFinder(List<LatLng> polygonBounds, LatLng marker) {
         this.polygonBounds = polygonBounds;
         this.marker = marker;
@@ -29,19 +27,16 @@ public class ClosestPointOnPolygonFinder extends AsyncTask<Void, Void, Double> {
     @Override
     protected Double doInBackground(Void... voids) {
 
+        //return null in case the polygon has less than two points
+        if(polygonBounds.size() < 2) return null;
+
         findClosestCouple();
-
-        //return null in case the polygon has less than to points
-        if(closest == null) return null;
-
         findClosetPointBetweenClosestCouple();
 
         return DistanceCalculator.coordinatesDistance(marker, closest);
     }
 
     private void findClosestCouple(){
-
-        if(polygonBounds.size() < 2) return;
 
         //init min point holders to the first two points
         closest = DistanceCalculator.min(marker, polygonBounds.get(0), polygonBounds.get(1));
@@ -73,8 +68,9 @@ public class ClosestPointOnPolygonFinder extends AsyncTask<Void, Void, Double> {
 
             LatLng mid = DistanceCalculator.midPoint(closest, secClosest);
 
-            closest = DistanceCalculator.min(marker, closest, mid);
-            secClosest = DistanceCalculator.max(marker, closest, mid);
+            LatLng prevClosest = new LatLng(closest.latitude, closest.longitude);
+            closest = DistanceCalculator.min(marker, prevClosest, mid);
+            secClosest = DistanceCalculator.max(marker, prevClosest, mid);
         }
     }
 }
