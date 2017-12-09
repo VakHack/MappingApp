@@ -14,10 +14,7 @@ import static java.lang.Math.sqrt;
 //To implements the intersection algorithm, I used the following stackoverflow thread:
 // https://stackoverflow.com/questions/563198/whats-the-most-efficent-way-to-calculate-where-two-line-segments-intersect
 
-public class IntersectionChecker {
-
-    public static final int START = 0;
-    public static final int END = 1;
+public class IntersectionFinder {
 
     private static LatLng findIntersection(LatLng[] first, LatLng[] sec){
 
@@ -49,7 +46,7 @@ public class IntersectionChecker {
         return new LatLng(first[0].latitude + (t * first_y), first[0].longitude + (t * first_x));
     }
 
-    public static boolean isIntersectWithinRange(LatLng[] first, LatLng[] sec){
+    public static boolean isIntersect(LatLng[] first, LatLng[] sec){
 
         return null != findIntersection(first, sec);
     }

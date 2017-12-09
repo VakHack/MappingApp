@@ -11,12 +11,12 @@ import java.util.List;
  * Created by Administrator on 08/12/2017.
  */
 
-public class PolygonRelationChecker extends AsyncTask<LatLng, Void, Boolean> {
+public class WithinPolygonChecker extends AsyncTask<LatLng, Void, Boolean> {
 
     private List<LatLng> boundaries;
     private int intersectionRange;
 
-    public PolygonRelationChecker(List<LatLng> boundaries, int intersectionRange) {
+    public WithinPolygonChecker(List<LatLng> boundaries, int intersectionRange) {
         this.boundaries = boundaries;
         this.intersectionRange = intersectionRange;
     }
@@ -34,7 +34,7 @@ public class PolygonRelationChecker extends AsyncTask<LatLng, Void, Boolean> {
 
             LatLng[] secLine = {boundaries.get(i), boundaries.get(i + 1)};
 
-            if(IntersectionChecker.isIntersectWithinRange(firstLine, secLine)) return true;
+            if(IntersectionFinder.isIntersect(firstLine, secLine)) return true;
         }
 
         return false;

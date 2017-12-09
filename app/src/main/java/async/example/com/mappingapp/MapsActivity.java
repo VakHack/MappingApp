@@ -22,7 +22,6 @@ import java.util.concurrent.ExecutionException;
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap map;
-    private KmlLayer allowedArea;
     private Marker customMarker = null;
     private PolygonsHandler ph;
 
@@ -66,8 +65,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 try {
 
                     if (ph.isWithin(latLng)) {
-
                         Toast.makeText(getApplicationContext(), "Marker is within polygon boundaries", Toast.LENGTH_SHORT).show();
+
+                    } else {
+                        ClosestPointOnPolygonFinder finder = new ClosestPointOnPolygonFinder(ph.getBoundaries(), latLng);
+                        int distance = finder.execute().get().intValue();
+
+                        Toast.makeText(getApplicationContext(), "Distance between marker and polygon: "
+                                + distance + " meters", Toast.LENGTH_SHORT).show();
                     }
 
                 } catch (InterruptedException e) {

@@ -80,7 +80,7 @@ public class PolygonsHandler {
 
     public boolean isWithin(LatLng latLng) throws ExecutionException, InterruptedException {
 
-        PolygonRelationChecker checker = new PolygonRelationChecker(boundaries, intersectionRange);
+        WithinPolygonChecker checker = new WithinPolygonChecker(boundaries, intersectionRange);
 
         return checker.execute(latLng).get();
     }
