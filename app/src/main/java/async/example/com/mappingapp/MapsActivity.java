@@ -27,7 +27,7 @@ import java.util.concurrent.ExecutionException;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
-    final private int INTERSECTION_BOUNDS = 3;
+    final private int INTERSECTION_BOUNDS = 5;
     final private int GOOD_POLY_INDEX = 0;
     final private int BAD_POLY_INDEX = 1;
 

@@ -48,11 +48,9 @@ public class ClosestPointOnPolygonFinder extends AsyncTask<Void, Void, Double> {
             LatLng localMin = DistanceCalculator.min(marker, polygonBounds.get(i), polygonBounds.get(i + 1));
             LatLng localMax = DistanceCalculator.max(marker, polygonBounds.get(i), polygonBounds.get(i + 1));
 
-            if (closest == localMin){
 
-                secClosest = DistanceCalculator.min(marker, secClosest, localMax);
-
-            } else if(localMin == DistanceCalculator.min(marker, closest, localMin)){
+            if((closest == localMin || localMin == DistanceCalculator.min(marker, localMin, closest))
+            && localMax == DistanceCalculator.min(marker, localMax, secClosest)){
 
                 closest = localMin;
                 secClosest = localMax;
