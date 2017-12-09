@@ -44,10 +44,9 @@ public class ClosestPointOnPolygonFinder extends AsyncTask<Void, Void, Double> {
 
         for(int i = 1; i < polygonBounds.size() - 1; ++i){
 
-            //for each couple of point, running on bounds in order, find their closest point to marker
+            //for each couple of point, running on bounds points in order, find their closest couple to marker
             LatLng localMin = DistanceCalculator.min(marker, polygonBounds.get(i), polygonBounds.get(i + 1));
             LatLng localMax = DistanceCalculator.max(marker, polygonBounds.get(i), polygonBounds.get(i + 1));
-
 
             if((closest == localMin || localMin == DistanceCalculator.min(marker, localMin, closest))
             && localMax == DistanceCalculator.min(marker, localMax, secClosest)){
@@ -67,6 +66,7 @@ public class ClosestPointOnPolygonFinder extends AsyncTask<Void, Void, Double> {
             LatLng mid = DistanceCalculator.midPoint(closest, secClosest);
 
             LatLng prevClosest = new LatLng(closest.latitude, closest.longitude);
+
             closest = DistanceCalculator.min(marker, prevClosest, mid);
             secClosest = DistanceCalculator.max(marker, prevClosest, mid);
         }

@@ -6,7 +6,6 @@ import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -17,6 +16,7 @@ import com.google.android.gms.maps.model.Gap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
@@ -27,7 +27,7 @@ import java.util.concurrent.ExecutionException;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
-    final private int INTERSECTION_BOUNDS = 5;
+    final private int INTERSECTION_BOUNDS = 57;
     final private int GOOD_POLY_INDEX = 0;
     final private int BAD_POLY_INDEX = 1;
 
@@ -36,8 +36,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Marker touchMarker = null;
     private Polyline distanceLine = null;
 
-    private PolygonHandler[] ph;
-    private PolygonOptions[] polygon;
+    private PolygonHandler[] polygonHndlr;
+    private PolygonOptions[] polygonOpt;
+    private Polygon[] polygons;
     private int currentActivePoly = BAD_POLY_INDEX;
 
     @Override
@@ -56,14 +57,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         bad.setTypeface(Typeface.createFromAsset(getAssets(), "Stay_Writer.ttf"));
     }
 
-    private void addPolygonToMap(int rawId, int num){
+    private void addPolygonToMap(int rawId, int i){
 
-        ph[num] = new PolygonHandler(map, getApplicationContext(), rawId, INTERSECTION_BOUNDS);
+        polygonHndlr[i] = new PolygonHandler(map, getApplicationContext(), rawId, INTERSECTION_BOUNDS);
 
         //adding given polygon to map
-        polygon[num] = new PolygonOptions();
-        polygon[num].addAll(ph[num].getBoundaries());
-        map.addPolygon(polygon[num]);
+        polygonOpt[i] = new PolygonOptions();
+        polygonOpt[i].addAll(polygonHndlr[i].getBoundaries());
+
+        polygons[i] = map.addPolygon(polygonOpt[i]);
     }
 
     @Override
@@ -71,8 +73,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         map = googleMap;
 
         //initialize the two polygons arrays
-        polygon = new PolygonOptions[2];
-        ph = new PolygonHandler[2];
+        polygonOpt = new PolygonOptions[2];
+        polygonHndlr = new PolygonHandler[2];
+        polygons = new Polygon[2];
 
         addPolygonToMap(R.raw.allowed_area, GOOD_POLY_INDEX);
         addPolygonToMap(R.raw.bad_sample, BAD_POLY_INDEX);
@@ -81,16 +84,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onMapClick(LatLng latLng) {
 
+                //delete existing marker and lines
                 if(touchMarker != null) touchMarker.remove();
                 if(distanceLine != null) distanceLine.remove();
 
+                //setting the tile of the drawn marker to lat/lng coordinates
                 touchMarker = map.addMarker(new MarkerOptions().position(latLng));
                 DecimalFormat df = new DecimalFormat("#.###");
                 touchMarker.setTitle("" + df.format(latLng.latitude) + "/" + df.format(latLng.longitude));
 
                 try {
 
-                    if (ph[currentActivePoly].isWithin(latLng)) {
+                    if (polygonHndlr[currentActivePoly].isWithin(latLng)) {
 
                         touchMarker.setSnippet("Within polygon");
                         touchMarker.showInfoWindow();
@@ -98,13 +103,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     } else {
 
                         ClosestPointOnPolygonFinder finder =
-                                new ClosestPointOnPolygonFinder(ph[currentActivePoly].getBoundaries(), latLng);
+                                new ClosestPointOnPolygonFinder(polygonHndlr[currentActivePoly].getBoundaries(), latLng);
 
                         int distance = finder.execute().get().intValue();
 
                         touchMarker.setSnippet("Distance to polygon: " + distance + "M");
                         touchMarker.showInfoWindow();
 
+                        //adding line from marker to polygon
                         distanceLine = map.addPolyline(new PolylineOptions()
                                 .add(latLng, finder.getClosest())
                                 .width(8)
@@ -127,7 +133,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 if(currentActivePoly == BAD_POLY_INDEX){
                     currentActivePoly = GOOD_POLY_INDEX;
 
-                    map.moveCamera(CameraUpdateFactory.newLatLngZoom(ph[GOOD_POLY_INDEX].getMidCoordinate(), 14));
+                    polygons[BAD_POLY_INDEX].setVisible(false);
+                    polygons[GOOD_POLY_INDEX].setVisible(true);
+
+                    map.moveCamera(CameraUpdateFactory.newLatLngZoom(polygonHndlr[GOOD_POLY_INDEX].getMidCoordinate(), 14));
                 }
             }
         });
@@ -142,7 +151,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 if(currentActivePoly == GOOD_POLY_INDEX){
                     currentActivePoly = BAD_POLY_INDEX;
 
-                    map.moveCamera(CameraUpdateFactory.newLatLngZoom(ph[BAD_POLY_INDEX].getMidCoordinate(), 6));
+                    polygons[BAD_POLY_INDEX].setVisible(true);
+                    polygons[GOOD_POLY_INDEX].setVisible(false);
+
+                    map.moveCamera(CameraUpdateFactory.newLatLngZoom(polygonHndlr[BAD_POLY_INDEX].getMidCoordinate(), 6));
                 }
             }
         });
