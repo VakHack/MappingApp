@@ -16,7 +16,7 @@ import static java.lang.Math.sqrt;
 
 public class IntersectionFinder {
 
-    private static LatLng findIntersection(LatLng[] first, LatLng[] sec){
+    public static boolean isIntersect(LatLng[] first, LatLng[] sec) {
 
         //find the equations of the two lines according to the sets of points
         double first_x = first[1].longitude - first[0].longitude;
@@ -25,29 +25,22 @@ public class IntersectionFinder {
         double sec_y = sec[1].latitude - sec[0].latitude;
 
         double denom = first_x * sec_y - sec_x * first_y;
-        if (denom == 0) return null;
+        if (denom == 0) return false;
 
         boolean denom_is_positive = denom > 0;
 
         double firstSec_x = first[0].longitude - sec[0].longitude;
         double firstSec_y = first[0].latitude - sec[0].latitude;
 
-        double s_numer = first_x * firstSec_y -first_y * firstSec_x;
-        if(s_numer< 0 == denom_is_positive) return null;
+        double s_numer = first_x * firstSec_y - first_y * firstSec_x;
+        if (s_numer < 0 == denom_is_positive) return false;
 
-        double t_numer =sec_x * firstSec_y - sec_y * firstSec_x;
-        if(t_numer< 0== denom_is_positive) return null;
+        double t_numer = sec_x * firstSec_y - sec_y * firstSec_x;
+        if (t_numer < 0 == denom_is_positive) return false;
 
-        if((s_numer >denom == denom_is_positive) || (t_numer >denom == denom_is_positive)) return null;
+        if ((s_numer > denom == denom_is_positive) || (t_numer > denom == denom_is_positive)) return false;
 
-        //collision detected
-        double t = t_numer / denom;
-
-        return new LatLng(first[0].latitude + (t * first_y), first[0].longitude + (t * first_x));
-    }
-
-    public static boolean isIntersect(LatLng[] first, LatLng[] sec){
-
-        return null != findIntersection(first, sec);
+        //else lines intersects
+        return true;
     }
 }

@@ -27,7 +27,7 @@ import java.util.concurrent.ExecutionException;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
-    final private int INTERSECTION_BOUNDS = 57;
+    final private int INTERSECTION_BOUNDS = 5;
     final private int GOOD_POLY_INDEX = 0;
     final private int BAD_POLY_INDEX = 1;
 
@@ -88,7 +88,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 if(touchMarker != null) touchMarker.remove();
                 if(distanceLine != null) distanceLine.remove();
 
-                //setting the tile of the drawn marker to lat/lng coordinates
+                //setting the title of the drawn marker to lat/lng coordinates
                 touchMarker = map.addMarker(new MarkerOptions().position(latLng));
                 DecimalFormat df = new DecimalFormat("#.###");
                 touchMarker.setTitle("" + df.format(latLng.latitude) + "/" + df.format(latLng.longitude));
@@ -105,9 +105,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         ClosestPointOnPolygonFinder finder =
                                 new ClosestPointOnPolygonFinder(polygonHndlr[currentActivePoly].getBoundaries(), latLng);
 
-                        int distance = finder.execute().get().intValue();
-
-                        touchMarker.setSnippet("Distance to polygon: " + distance + "M");
+                        touchMarker.setSnippet("Distance to polygon: " + finder.execute().get().intValue() + "M");
                         touchMarker.showInfoWindow();
 
                         //adding line from marker to polygon
